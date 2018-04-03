@@ -23,20 +23,16 @@ class UsersDatatable < ApplicationDatatable
 
   def users
     @users ||= fetch_users    
-
   end
 
   def fetch_users
-    search_string = []
-    columns.each do |term|
-      search_string << "#{term} like :search"
-    end
 
     users = User.order("#{sort_column} #{sort_direction}")
     users = users.page(page).per(per_page)
-    
+
     condition = /#{params[:search][:value]}/i
-    users = users.or({:first_name => condition}).or({last_name: condition}).or({birthday: condition}).or({address: condition})  
+    users = users.or({:first_name => condition}).or({last_name: condition}).or({birthday: condition}).or({address: condition}) 
+    
   end
 
   def columns
