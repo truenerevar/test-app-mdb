@@ -25,14 +25,23 @@ class UsersDatatable < ApplicationDatatable
     @users ||= fetch_users    
   end
 
+  def valid_time?(string)
+    Time.parse(string)
+    true
+  rescue ArgumentError
+    false
+  end
+
   def fetch_users
 
     users = User.order("#{sort_column} #{sort_direction}")
     users = users.page(page).per(per_page)
 
     condition = /#{params[:search][:value]}/i
-    users = users.or({:first_name => condition}).or({last_name: condition}).or({birthday: condition}).or({address: condition}) 
-    
+    query = [{:first_name => condition},{last_name: condition}, {address: condition}] 
+    query << {birthday: Date.parse(params[:search][:value])} if valid_time?(params[:search][:value])
+    users.or(query)
+
   end
 
   def columns
